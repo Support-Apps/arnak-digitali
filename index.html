@@ -68,11 +68,17 @@
         }
         
         .balance-box {
-            flex: 0 1 180px;
+            width: 120px;
+            height: 100px;
             text-align: center;
-            padding: 15px;
+            padding: 12px 8px;
             border-radius: 20px;
             border: 2px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
         
         .balance-box.wallet-balance {
@@ -84,17 +90,17 @@
         }
         
         .balance-box.bank-balance {
-            background: linear-gradient(135deg, #e8e8e8, #d0d0d0);
+            background: #e0e0e0;
         }
         
         .balance-label {
-            font-size: 16px;
+            font-size: 14px;
             color: #666;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         
         .balance-amount {
-            font-size: 36px;
+            font-size: 24px;
             font-weight: bold;
             color: var(--gold);
         }
@@ -440,7 +446,7 @@
             <div class="actions">
                 <button class="action-btn bank-btn" onclick="openBankModal()">🏦 משיכה לחשבון בנק</button>
                 <button class="action-btn savings-btn" onclick="openSavingsModal()">🐷 העברה לחיסכון</button>
-                <button class="action-btn reset-btn" onclick="resetAll()">🔄 התחל מחדש</button>
+                <button class="action-btn reset-btn" onclick="doReset()">🔄 התחל מחדש</button>
             </div>
         </div>
         
@@ -534,8 +540,15 @@
     </div>
     
     <script>
+        // === RESET FUNCTION FIRST - חייב להיות ראשון! ===
+        function doReset() {
+            alert('מאפס את הארנק...');
+            localStorage.removeItem('myDigitalWallet');
+            location.reload();
+        }
+        
         // נתוני סניפים לכל בנק
-        const branchesData = {
+        var branchesData = {
             '12': [ // פועלים
                 {num: '600', name: 'סניף ראשי תל אביב'},
                 {num: '532', name: 'דיזנגוף תל אביב'},
@@ -959,21 +972,6 @@
             saveState();
             updateDisplay();
             closeSavingsModal();
-        }
-        
-        function resetAll() {
-            if (confirm('האם את בטוחה שרוצה להתחיל מחדש? כל הכסף יימחק.')) {
-                state = {
-                    wallet: { 1: 0, 2: 0, 5: 0, 10: 0, 20: 0, 50: 0, 100: 0, 200: 0 },
-                    savings: 0,
-                    bank: 0,
-                    bankAccount: null,
-                    history: []
-                };
-                saveState();
-                updateDisplay();
-                alert('הארנק אופס בהצלחה!');
-            }
         }
         
         // סגירת מודאל בלחיצה בחוץ
