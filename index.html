@@ -537,6 +537,7 @@
     <div class="modal-overlay" id="savingsModal">
         <div class="modal">
             <div class="modal-title">🐷 העברה לחיסכון</div>
+            <p style="text-align: center; color: #666; margin-bottom: 15px;">העברה מחשבון הבנק לחיסכון</p>
             <div class="form-group">
                 <label class="form-label">סכום להעברה:</label>
                 <input type="number" class="form-input" id="savingsAmount" placeholder="כמה להעביר?" min="1">
@@ -998,31 +999,20 @@
         }
         
         function confirmSavings() {
-            const amount = parseInt(document.getElementById('savingsAmount').value);
-            const balance = getWalletBalance();
+            var amount = parseInt(document.getElementById('savingsAmount').value);
             
             if (!amount || amount <= 0) {
                 document.getElementById('savingsError').textContent = 'נא להזין סכום תקין';
                 return;
             }
-            if (amount > balance) {
-                document.getElementById('savingsError').textContent = 'אין מספיק כסף בארנק!';
+            if (amount > state.bank) {
+                document.getElementById('savingsError').textContent = 'אין מספיק כסף בחשבון הבנק!';
                 return;
             }
             
-            // ביצוע ההעברה
-            let remaining = amount;
-            const denominations = [200, 100, 50, 20, 10, 5, 2, 1];
-            
-            for (let denom of denominations) {
-                while (remaining >= denom && state.wallet[denom] > 0) {
-                    state.wallet[denom]--;
-                    remaining -= denom;
-                }
-            }
-            
+            state.bank -= amount;
             state.savings += amount;
-            addHistory('savings', amount, 'העברה לחיסכון 🐷');
+            addHistory('savings', amount, 'העברה מהבנק לחיסכון 🐷');
             saveState();
             updateDisplay();
             
