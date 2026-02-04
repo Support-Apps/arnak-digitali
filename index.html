@@ -145,6 +145,12 @@
             border-radius: 10px;
         }
         
+        .money-time {
+            font-size: 11px;
+            color: #888;
+            direction: ltr;
+        }
+        
         .empty-wallet {
             text-align: center;
             color: #888;
@@ -194,8 +200,11 @@
         }
         
         .money-btn:hover {
-            transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .money-btn:active {
+            opacity: 0.8;
         }
         
         .coin-btn {
@@ -734,7 +743,8 @@
             savings: 0,
             bank: 0,
             bankAccount: null,
-            history: []
+            history: [],
+            deposits: []
         };
         
         function loadState() {
@@ -759,12 +769,25 @@
         
         function deposit(amount) {
             state.wallet[amount]++;
-            addHistory('deposit', amount, `הפקדת ₪${amount}`);
+            var now = new Date();
+            var timeStr = now.toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', 
+                day: '2-digit', 
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            if (!state.deposits) state.deposits = [];
+            state.deposits.push({ amount: amount, time: timeStr });
+            addHistory('deposit', amount, 'הפקדת ₪' + amount);
             saveState();
             updateDisplay();
             
+            alert('✅ הופקדו ₪' + amount + ' לארנק\nתאריך: ' + timeStr);
+            
             document.getElementById('walletBalance').classList.add('depositing');
-            setTimeout(() => document.getElementById('walletBalance').classList.remove('depositing'), 300);
+            setTimeout(function() { document.getElementById('walletBalance').classList.remove('depositing'); }, 300);
         }
         
         function updateDisplay() {
@@ -772,19 +795,20 @@
             document.getElementById('savingsBalance').textContent = '₪' + state.savings;
             document.getElementById('bankBalance').textContent = '₪' + state.bank;
             
-            // עדכון תוכן הארנק
-            const contentsEl = document.getElementById('walletContents');
-            let html = '';
+            // עדכון תוכן הארנק - תצוגה מקובצת
+            var contentsEl = document.getElementById('walletContents');
+            var html = '';
             
-            const denominations = [1, 2, 5, 10, 20, 50, 100, 200];
+            var denominations = [1, 2, 5, 10, 20, 50, 100, 200];
             
-            for (let denom of denominations) {
+            for (var i = 0; i < denominations.length; i++) {
+                var denom = denominations[i];
                 if (state.wallet[denom] > 0) {
-                    const svg = denom <= 10 ? coinSVGs[denom] : billSVGs[denom];
-                    html += `<div class="money-item">
-                        ${svg}
-                        <span class="money-count">x${state.wallet[denom]}</span>
-                    </div>`;
+                    var svg = denom <= 10 ? coinSVGs[denom] : billSVGs[denom];
+                    html += '<div class="money-item">' +
+                        svg +
+                        '<span class="money-count">x' + state.wallet[denom] + '</span>' +
+                    '</div>';
                 }
             }
             
@@ -798,7 +822,7 @@
         
         function addHistory(type, amount, text) {
             const now = new Date();
-            const timeStr = now.toLocaleString('he-IL', { 
+            const timeStr = now.toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', 
                 day: '2-digit', 
                 month: '2-digit',
                 hour: '2-digit', 
@@ -922,15 +946,25 @@
             updateDisplay();
             
             // הצגת הצלחה
+            var now = new Date();
+            var dateStr = now.toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', 
+                day: '2-digit', 
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
             document.getElementById('bankFormSection').style.display = 'none';
             document.getElementById('bankSuccessSection').style.display = 'block';
-            document.getElementById('transferDetails').innerHTML = `
-                <p><strong>סכום:</strong> ₪${amount}</p>
-                <p><strong>בנק:</strong> ${state.bankAccount.bankName}</p>
-                <p><strong>סניף:</strong> ${state.bankAccount.branchName}</p>
-                <p><strong>מספר חשבון:</strong> ${accountNumber}</p>
-                <p><strong>שם:</strong> ${accountName}</p>
-            `;
+            document.getElementById('transferDetails').innerHTML = 
+                '<p><strong>תאריך ושעה:</strong> ' + dateStr + '</p>' +
+                '<p><strong>סכום:</strong> ₪' + amount + '</p>' +
+                '<p><strong>בנק:</strong> ' + state.bankAccount.bankName + '</p>' +
+                '<p><strong>סניף:</strong> ' + state.bankAccount.branchName + '</p>' +
+                '<p><strong>מספר חשבון:</strong> ' + accountNumber + '</p>' +
+                '<p><strong>שם:</strong> ' + accountName + '</p>' +
+                '<p style="margin-top:10px; color: var(--gold); font-weight:bold;">✅ ההעברה בוצעה בהצלחה</p>';
         }
         
         function openSavingsModal() {
@@ -971,6 +1005,17 @@
             addHistory('savings', amount, 'העברה לחיסכון 🐷');
             saveState();
             updateDisplay();
+            
+            var now = new Date();
+            var dateStr = now.toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', 
+                day: '2-digit', 
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            alert('✅ הועבר לחיסכון בהצלחה!\n\nסכום: ₪' + amount + '\nתאריך: ' + dateStr);
             closeSavingsModal();
         }
         
