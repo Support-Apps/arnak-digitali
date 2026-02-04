@@ -68,7 +68,8 @@
         }
         
         .balance-box {
-            width: 120px;
+            flex: 1;
+            min-width: 100px;
             height: 100px;
             text-align: center;
             padding: 12px 8px;
@@ -453,7 +454,7 @@
             </div>
             
             <div class="actions">
-                <button class="action-btn bank-btn" onclick="openBankModal()">🏦 משיכה לחשבון בנק</button>
+                <button class="action-btn bank-btn" onclick="openBankModal()">🏦 העברה לחשבון הבנק</button>
                 <button class="action-btn savings-btn" onclick="openSavingsModal()">🐷 העברה לחיסכון</button>
                 <button class="action-btn reset-btn" onclick="doReset()">🔄 התחל מחדש</button>
             </div>
@@ -470,11 +471,11 @@
     <!-- Bank Transfer Modal -->
     <div class="modal-overlay" id="bankModal">
         <div class="modal">
-            <div class="modal-title">🏦 משיכה לחשבון בנק</div>
+            <div class="modal-title">🏦 העברה לחשבון הבנק</div>
             
             <div id="bankFormSection">
                 <div class="form-group">
-                    <label class="form-label">סכום למשיכה:</label>
+                    <label class="form-label">סכום להעברה:</label>
                     <input type="number" class="form-input" id="bankAmount" placeholder="הזיני סכום" min="1">
                 </div>
                 
@@ -760,11 +761,28 @@
         }
         
         function getWalletBalance() {
-            let total = 0;
-            for (let denom in state.wallet) {
+            var total = 0;
+            for (var denom in state.wallet) {
                 total += parseInt(denom) * state.wallet[denom];
             }
             return total;
+        }
+        
+        function formatNumber(num) {
+            return num.toLocaleString('he-IL');
+        }
+        
+        function autoSizeBalance(el) {
+            var text = el.textContent;
+            if (text.length > 10) {
+                el.style.fontSize = '14px';
+            } else if (text.length > 7) {
+                el.style.fontSize = '17px';
+            } else if (text.length > 5) {
+                el.style.fontSize = '20px';
+            } else {
+                el.style.fontSize = '24px';
+            }
         }
         
         function deposit(amount) {
@@ -789,9 +807,13 @@
         }
         
         function updateDisplay() {
-            document.getElementById('walletBalance').textContent = '₪' + getWalletBalance();
-            document.getElementById('savingsBalance').textContent = '₪' + state.savings;
-            document.getElementById('bankBalance').textContent = '₪' + state.bank;
+            document.getElementById('walletBalance').textContent = '₪' + formatNumber(getWalletBalance());
+            document.getElementById('savingsBalance').textContent = '₪' + formatNumber(state.savings);
+            document.getElementById('bankBalance').textContent = '₪' + formatNumber(state.bank);
+            
+            autoSizeBalance(document.getElementById('walletBalance'));
+            autoSizeBalance(document.getElementById('savingsBalance'));
+            autoSizeBalance(document.getElementById('bankBalance'));
             
             // עדכון תוכן הארנק - תצוגה מקובצת
             var contentsEl = document.getElementById('walletContents');
@@ -918,7 +940,7 @@
                 return;
             }
             
-            // ביצוע המשיכה
+            // ביצוע ההעברה
             let remaining = amount;
             const denominations = [200, 100, 50, 20, 10, 5, 2, 1];
             
