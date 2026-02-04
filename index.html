@@ -460,7 +460,7 @@
         </div>
         
         <div class="history-section">
-            <div class="section-title">📜 היסטוריה</div>
+            <div class="section-title">📜 תנועות</div>
             <div id="history">
                 <div class="no-history">אין עדיין פעולות</div>
             </div>
@@ -783,8 +783,6 @@
             addHistory('deposit', amount, 'הפקדת ₪' + amount);
             saveState();
             updateDisplay();
-            
-            alert('✅ הופקדו ₪' + amount + ' לארנק\nתאריך: ' + timeStr);
             
             document.getElementById('walletBalance').classList.add('depositing');
             setTimeout(function() { document.getElementById('walletBalance').classList.remove('depositing'); }, 300);
